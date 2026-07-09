@@ -98,6 +98,12 @@ func TestRunReviewTaskCreatesSourceContextThenDraft(t *testing.T) {
 	if !strings.Contains(artifacts[0].Content, "Bug: review ops context") {
 		t.Fatalf("source context missing issue title: %s", artifacts[0].Content)
 	}
+	if !strings.Contains(artifacts[1].Content, "Review Ops draft for owner/repo #42") {
+		t.Fatalf("draft should come from LocalDraftRunner: %s", artifacts[1].Content)
+	}
+	if !strings.Contains(artifacts[1].Content, "Source context summary") {
+		t.Fatalf("draft missing source context summary: %s", artifacts[1].Content)
+	}
 	if !strings.Contains(artifacts[1].Content, "No GitHub mutations were performed") {
 		t.Fatalf("draft missing safety note: %s", artifacts[1].Content)
 	}
@@ -158,7 +164,13 @@ func TestRunReviewTaskFetchFailureStillCreatesDraft(t *testing.T) {
 	if artifacts[0].Kind != reviewops.ArtifactKindMarkdown {
 		t.Fatalf("expected markdown draft, got %s", artifacts[0].Kind)
 	}
-	if !strings.Contains(artifacts[0].Content, "Source context fetch failed") {
+	if !strings.Contains(artifacts[0].Content, "Source context fetch note") {
 		t.Fatalf("draft should mention fetch failure: %s", artifacts[0].Content)
+	}
+	if !strings.Contains(artifacts[0].Content, "Source context was unavailable") {
+		t.Fatalf("draft should explain missing context: %s", artifacts[0].Content)
+	}
+	if !strings.Contains(artifacts[0].Content, "No GitHub mutations were performed") {
+		t.Fatalf("draft missing safety note: %s", artifacts[0].Content)
 	}
 }
